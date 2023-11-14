@@ -136,13 +136,13 @@ def set_warships_random(matrix: list[list[str]], ships: dict[str, int]) -> list[
             >>> give_random_coordinates(matrix, "3")
             [(2, 3), (3, 3), (4, 3)]
     """
-        vertical_position, horizontal_position = 0, 1
-        rand_position = random.randint(vertical_position, horizontal_position)
+        position = (0, 1)
+        rand_position = random.randint(*position)
         rand_row = random.randint(1, len(matrix) - int(ship))
-        if rand_position == vertical_position:
+        if rand_position == position[0]:  # vertical
             rand_row = random.randint(1, len(matrix) - int(ship))
             coordinates = [(rand_row + i, rand_row) for i in range(int(ship))]
-        else:
+        else:  # horizontal
             rand_col = random.randint(1, len(matrix[0]) - int(ship))
             coordinates = [(rand_row, rand_col + i) for i in range(int(ship))]
         return coordinates
