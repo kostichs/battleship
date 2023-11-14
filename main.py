@@ -1,382 +1,235 @@
-# Homework: NAVY BATTLE
 
-# Kostichev Sergey
-# Start date: 09.11.2023
-# End date: 11.11.2023
-
-import random
 import sys
-
-EMPTY_CELL = '.'  # This constant string is used to fill the inside part of the board for easy navigation.
-SHIP_CELL = 'o'  # Constant for displaying the ship on the board.
-AROUND_CELL = '-'  # Constant for displaying cells around the placed ship.
-COLLISION_CELL = '?'  # Constant for displaying that the current ship can't be placed here.
-AROUND_SHIP_DIRECTIONS = (  # set of 8 directions around any cell like top, down, left, right and diagonal.
-    (0, -1),  # y-1
-    (-1, -1),  # x-1, y-1
-    (-1, 0),  # x-1
-    (-1, 1),  # x-1, y+1
-    (0, 1),  # y+1
-    (1, 1),  # x+1, y+1
-    (1, 0),  # x+1
-    (1, -1)  # x+1, y-1
-)
+import ship_generation as sg
+from PyQt5 import uic
+from PyQt5.QtGui import QFont, QPixmap
+from PyQt5.QtWidgets import QApplication, QMainWindow
 
 
-def start() -> None:
-    """
-    Initialize and start the battleship game.
+class App(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi('ship_generating_form.ui', self)
+        self.logo_lbl.setPixmap(QPixmap('logo3.png'))
+        self.random_btn.clicked.connect(self.update_bot_window)
+        self.apply_btn.clicked.connect(self.apply)
+        self.up_btn.clicked.connect(self.up)
+        self.down_btn.clicked.connect(self.down)
+        self.left_btn.clicked.connect(self.left)
+        self.right_btn.clicked.connect(self.right)
+        self.rotate_btn.clicked.connect(self.rotate)
+        self.reset_btn.clicked.connect(self.reset)
 
-    This function sets up the game boards for both the player and the bot,
-    randomly places warships on the bot's board, and allows the player to place their warships.
-    The game boards are then displayed to start the game.
+        # List of coordinates for the already placed ships.
+        # It includes a list of its own coordinates and tuples of the neighboring cells around the ship.
+        self.placed_warships = list()
 
-    Returns:
-        None
-    """
-    board_size = 11  # 11x11 = 100 cell + 20 cell for coordinates + 1 for empty cell 0x0.
-    warships = {  # Set of n-cell-long warships as a key and with their amounts on the game board as a value.
-        "4": 1,
-        "3": 2,
-        "2": 3,
-        "1": 4,
-    }
+        self.set_warships = list()  # List to store the remaining ship types and their quantities.
 
-    board_bot = [[EMPTY_CELL for _ in range(board_size)] for _ in range(board_size)]
-    board_bot = set_warships_random(board_bot, warships)
-    display_board(board_bot)
+        self.bot_board = list()  # List representing the game board for the computer opponent.
 
-    board_player = [[EMPTY_CELL for _ in range(board_size)] for _ in range(board_size)]
-    board_player = set_player_warships(board_player, warships)
+        self.player_board = list()  # List representing the game board for the player.
 
-    return
+        self.current_coordinates_of_ship = list()  # List to store the current coordinates of the player's ship.
 
+        self.is_horizontal = True  # Boolean flag indicating the orientation of the current ship(horizontal by default).
+        # Set a fixed-width font for QTextEdit
+        font = QFont("Courier New")
+        self.bot_window.setFont(font)
+        self.player_window.setFont(font)
 
-def display_board(matrix: list[list[str]]) -> None:
-    """
-    Print the game board, represented as a matrix of cell states.
+        self.start_player()
 
-    Each cell's state is printed in the middle of a cell_size.
-    The 'letters' string is used to fill the right edge of the board.
-    The cell at board[0][0] is intentionally left empty because it doesn't participate in the game.
-
-    Parameters:
-        matrix (list[list[str]]): A list of lists representing the current state of the game board.
-
-    Returns:
-        None
-    """
-    letters = 'ABCDEFGHIJ'
-    for row in range(1, len(matrix)):
-        matrix[row][0] = letters[row - 1]
-
-    for col in range(1, len(matrix)):
-        matrix[0][col] = str(col)
-
-    cell_size = 3
-    flag = True  # avoids changing of the cell 0x0 that has to be empty.
-    matrix[0][0] = ' '
-    for row in matrix:
-        for col in row:
-            if flag:
-                flag = False
-            print(f'{col:^{cell_size}}', end=" ")
-        print()
-
-
-def set_warships_random(matrix: list[list[str]], ships: dict[str, int]) -> list[list[str]]:
-    """
-    Randomly places warships on the game board matrix.
-
-    Each warship is represented by a specific character (SHIP_CELL) in the matrix,
-    and empty cells around the ship are set to ' ' to avoid collision with other ships.
-
-    Parameters:
-        matrix (list[list[str]]): The game board represented as a matrix of cell states.
-        ships (dict[str, int]): Dictionary of n-cell-long warships as keys with their amounts as values.
-
-    Returns:
-        list[list[str]]: The updated game board matrix with randomly placed warships.
-    """
-    def find_empty_cells(coordinates: ()) -> bool:
-        """Check if chosen cells are empty to locate a ship on the board."""
-        for coordinate in coordinates:  # check if chosen cells are empty to locate a ship on the board.
-            if matrix[coordinate[0]][coordinate[1]] != EMPTY_CELL:
-                return False
-        else:
-            return True
-
-    def is_empty(cell: str) -> bool:
-        """This function is part of the calculation for neighboring cells to avoid redundant computations."""
-        return cell != SHIP_CELL
-
-    def give_random_coordinates() -> list[tuple]:
+    def update_bot_window(self) -> None:
         """
-        Generate random coordinates for placing a ship on the game board matrix.
+        Updates the display for the bot game board.
 
-        The function selects a random coordinate within the range of the matrix length minus the ship length
-        to avoid going beyond the matrix boundaries. It also randomly chooses between vertical and horizontal
-        positions for the ship.
-
-        The selected coordinates are checked to ensure they are free and not too close to other ships. If any of
-        the coordinates does not meet the check conditions, the randomization process restarts. If the coordinates
-        pass the checks, they are added to the ship's coordinate list.
-
-        Parameters:
-            matrix (list[list[str]]): The game board represented as a matrix of cell states.
-            ship (str): The size of the ship for which random coordinates are generated.
-
-        Returns:
-            list[tuple]: A list of tuples representing the generated random coordinates for placing the ship.
-
-        Raises:
-            ValueError: If the size of the ship is not a positive integer.
-
-        Example:
-            >>> give_random_coordinates(matrix, "3")
-            [(2, 3), (3, 3), (4, 3)]
-    """
-        vertical_position, horizontal_position = 0, 1
-        rand_position = random.randint(vertical_position, horizontal_position)
-        rand_row = random.randint(1, len(matrix) - int(ship))
-        if rand_position == vertical_position:
-            rand_row = random.randint(1, len(matrix) - int(ship))
-            coordinates = [(rand_row + i, rand_row) for i in range(int(ship))]
-        else:
-            rand_col = random.randint(1, len(matrix[0]) - int(ship))
-            coordinates = [(rand_row, rand_col + i) for i in range(int(ship))]
-        return coordinates
-
-    for ship, value in ships.items():  # every ship from warships dictionary
-        for _ in range(value):  # value = amount of the ships (1, 2, 3, 4)
-            while True:
-                ship_coordinates = give_random_coordinates()
-                if find_empty_cells(ship_coordinates):
-                    for x in range(len(ship_coordinates)):
-                        matrix[ship_coordinates[x][0]][ship_coordinates[x][1]] = SHIP_CELL
-                    # warship is placed. Now we need to set empty cells around the ship to avoid collision with
-                    # other ships.
-                    for c in range(len(ship_coordinates)):
-                        # Write a tuple of coordinates around the current ship.
-                        # Put a unique symbol for every single cell around the ship.
-                        for i in AROUND_SHIP_DIRECTIONS:
-                            if 0 < ship_coordinates[c][0] + i[0] < len(matrix) \
-                                    and 0 < ship_coordinates[c][1] + i[1] < len(matrix) \
-                                    and is_empty(matrix[ship_coordinates[c][0] + i[0]][ship_coordinates[c][1] + i[1]]):
-                                matrix[ship_coordinates[c][0] + i[0]][ship_coordinates[c][1] + i[1]] = ' '
-                            else:
-                                continue
-                    break
-                else:
-                    continue
-
-    return matrix
-
-
-def set_player_warships(matrix: list[list[str]], ships: dict[str, int]) -> list[list[str]]:
-    """
-    Place player's warships on the game board matrix.
-
-    The function allows the player to interactively place their warships using input-method. It provides
-    the ability to move WASD, rotate Q or E, and apply the placement of each ship X, while ensuring valid positions
-    and avoiding collisions with other ships.
-
-    Parameters:
-        matrix (list[list[str]]): The game board represented as a matrix of cell states.
-        ships (dict[str, int]): Dictionary of n-cell-long warships as keys with their amounts as values.
-
-    Returns:
-        list[list[str]]: The updated game board matrix with player-placed warships.
-    """
-
-    def clear_previous_step(coordinates: list[list]) -> None:
-        """Clear the symbols on the previous coordinates of a ship in matrix"""
-        for coord in range(len(coordinates)):
-            matrix[coordinates[coord][0]][coordinates[coord][1]] = EMPTY_CELL
-
-    def draw_current_ship(warships: list[list[list[int]]], current_coordinates: list[list[int]]) -> None:
-        """
-        Redraw the matrix considering the coordinates of already placed ships and the current ship.
-
-        The function updates the game board matrix by redrawing the coordinates of both already placed ships and
-        the current ship. Depending on the state, the cell of the current ship may be drawn as a ship or as
-        a question mark if it intersects with the coordinates of already placed ships.
-
-        Parameters:
-            warships (list[list[list[int]]]): List of coordinates of already placed ships on the game board.
-            current_coordinates (list[list[int]]): List of coordinates of the current ship.
+        This function creates a new list and generates random placements of ships. The generated matrix is displayed
+        on the console and in the text field of the widget.
 
         Returns:
             None
         """
-        is_collided = False
-        # First, the list of placed ships is empty.
-        if len(warships) > 0:
-            """Compares every coordinate of current ship with every coordinate of every single placed ship
-            to ensure there are no collisions."""
-            for current_coordinate in range(len(current_coordinates)):
-                for war in warships:
-                    for w in war:
-                        if current_coordinates[current_coordinate][0] == w[0] \
-                                and current_coordinates[current_coordinate][1] == w[1]:
-                            matrix[current_coordinates[current_coordinate][0]][
-                                current_coordinates[current_coordinate][1]] = COLLISION_CELL
-                            is_collided = True
-                            break
-                if not is_collided:
-                    matrix[current_coordinates[current_coordinate][0]][
-                        current_coordinates[current_coordinate][1]] = SHIP_CELL
-        else:
-            for current_coordinate in range(len(current_coordinates)):  # place a ship on the matrix.
-                matrix[current_coordinates[current_coordinate][0]][
-                    current_coordinates[current_coordinate][1]] = SHIP_CELL
+        self.bot_board = sg.create_board()
+        self.bot_board = sg.set_warships_random(self.bot_board, sg.WARSHIPS)
+        self.bot_window.clear()
+        sg.display_board(self.bot_board)
+        self.bot_window.append(sg.format_matrix_without_points(self.bot_board))
 
-    def redraw_matrix(warships: list[list[list[int]]]) -> None:
+    def up(self) -> None:
         """
-        Redraws all previously placed ships before drawing a new ship.
+        Move the current ship upward on the player's game board.
 
-        Parameters:
-            warships (list[list[list[int]]]): List of coordinates of already placed ships on the game board.
+        This method checks if there are ships left to place on the board and updates the player window accordingly.
+        If there are no more ships, the user is notified with a relevant message.
 
         Returns:
             None
         """
-        for warship in warships:
-            for w in warship:
-                if type(w) == list:
-                    matrix[w[0]][w[1]] = SHIP_CELL
-                else:
-                    matrix[w[0]][w[1]] = ''
+        if len(self.set_warships) > 0:
+            sg.motion(-1, 0, self.current_coordinates_of_ship, self.player_board, self.placed_warships)
+            self.update_player_window()
+        else:
+            self.notify('There are no more ships.')
 
-    def rotate_ship(horizontal: bool) -> bool:
+    def down(self) -> None:
         """
-        Rotate the ship either from a horizontal to a vertical position or vice versa.
+        Move the current ship downward on the player's game board.
 
-        The function checks the current position of the ship, and depending on whether it is in a horizontal or vertical
-        position, calculates new coordinates to rotate the ship. It also checks whether the new position goes beyond the
-        matrix boundaries. If rotation is not possible due to going out of the matrix range, the ship's position remains
-        unchanged, and no modifications occur.
-
-        Parameters:
-            horizontal (bool): The current orientation of the ship. True for horizontal, False for vertical.
+        This method checks if there are ships left to place on the board and updates the player window accordingly.
+        If there are no more ships, the user is notified with a relevant message.
 
         Returns:
-            bool: The new orientation of the ship after attempting to rotate. True for horizontal, False for vertical.
+            None
         """
-        _horizontal = horizontal
-        if _horizontal:  # horizontal position
-            for i in range(len(current_coordinates_of_ship)):
-                current_cell = current_coordinates_of_ship[i]  # reduce the length of next expressions.
-                if current_cell[0] - int(ship) // 2 + i < 1 \
-                        or current_cell[0] - int(ship) // 2 + i > len(matrix) - 1 \
-                        or current_cell[1] + int(ship) // 2 - i < 1 \
-                        or current_cell[1] + int(ship) // 2 - i > len(matrix) - 1:
-                    break
+        if len(self.set_warships) > 0:
+            sg.motion(1, 0, self.current_coordinates_of_ship, self.player_board, self.placed_warships)
+            self.update_player_window()
+        else:
+            self.notify('There are no more ships.')
+
+    def left(self) -> None:
+        """
+        Move the current ship to the left side on the player's game board.
+
+        This method checks if there are ships left to place on the board and updates the player window accordingly.
+        If there are no more ships, the user is notified with a relevant message.
+
+        Returns:
+            None
+        """
+        if len(self.set_warships) > 0:
+            sg.motion(0, -1, self.current_coordinates_of_ship, self.player_board, self.placed_warships)
+            self.update_player_window()
+        else:
+            self.notify('There are no more ships.')
+
+    def right(self) -> None:
+        """
+        Move the current ship to the right side on the player's game board.
+
+        This method checks if there are ships left to place on the board and updates the player window accordingly.
+        If there are no more ships, the user is notified with a relevant message.
+
+        Returns:
+            None
+        """
+        if len(self.set_warships) > 0:
+            sg.motion(0, 1, self.current_coordinates_of_ship, self.player_board, self.placed_warships)
+            self.update_player_window()
+        else:
+            self.notify('There are no more ships.')
+
+    def rotate(self) -> None:
+        """
+        Rotate the current ship depending on its current position on the player's game board.
+
+        This method checks if there are ships left to place on the board and updates the player window accordingly.
+        If there are no more ships, the user is notified with a relevant message.
+
+        Returns:
+            None
+    """
+        if len(self.set_warships) > 0:
+            self.is_horizontal = sg.rotate_ship(self.is_horizontal, self.set_warships,
+                                                self.current_coordinates_of_ship, self.player_board,
+                                                self.placed_warships)
+            sg.motion(0, 0, self.current_coordinates_of_ship, self.player_board, self.placed_warships)
+            self.update_player_window()
+        else:
+            self.notify('There are no more ships.')
+
+    def apply(self) -> None:
+        """
+        Confirm the current coordinates of the ship as the final position.
+
+        After confirmation, all lists related to the current ship will be cleared.
+        If all ships are already placed, this function will be ignored.
+
+        :return: None
+        """
+        if len(self.set_warships) > 0:
+            if sg.apply_placement(self.player_board, self.current_coordinates_of_ship):
+                # every ship has list of its own coordinates and set of cells around it.
+                self.placed_warships.append(list(self.current_coordinates_of_ship))
+                # self.redraw_matrix(self.placed_warships)
+                sg.redraw_matrix(self.player_board, self.placed_warships)
+                self.current_coordinates_of_ship.clear()
+                # after this type of ship was placed, its amount is reduced.
+                self.set_warships[0][1] -= 1
+                self.update_player_window()
+                # self.display_player_ship()
+                self.notify(sg.display_player_ship(self.set_warships, self.player_board,
+                            self.current_coordinates_of_ship, self.placed_warships))
+                self.update_player_window()
+                self.is_horizontal = True
             else:
-                _horizontal = not _horizontal
-                clear_previous_step(current_coordinates_of_ship)
-                for i in range(len(current_coordinates_of_ship)):
-                    current_cell = current_coordinates_of_ship[i]
-                    current_cell[0] = current_cell[0] - int(ship) // 2 + i
-                    current_cell[1] = current_cell[1] + int(ship) // 2 - i
-                redraw_matrix(placed_warships)
-                draw_current_ship(placed_warships, current_coordinates_of_ship)
-        else:  # vertical position
-            for i in range(len(current_coordinates_of_ship)):
-                current_cell = current_coordinates_of_ship[i]
-                if current_coordinates_of_ship[i][1] - int(ship) // 2 + i < 1 \
-                        or current_cell[1] - int(ship) // 2 + i > len(matrix) - 1 \
-                        or current_cell[0] + int(ship) // 2 - i < 1 \
-                        or current_cell[0] + int(ship) // 2 - i > len(matrix) - 1:
-                    break
-            else:
-                _horizontal = True
-                clear_previous_step(current_coordinates_of_ship)
-                for i in range(len(current_coordinates_of_ship) - 1, -1, -1):
-                    current_cell = current_coordinates_of_ship[i]
-                    current_cell[0] = current_cell[0] + int(ship) // 2 - i
-                    current_cell[1] = current_cell[1] - int(ship) // 2 + i
-                redraw_matrix(placed_warships)
-                draw_current_ship(placed_warships, current_coordinates_of_ship)
-        return _horizontal
+                self.notify('Choose another place.')
+                return
+        else:
+            self.notify('There are no more ships.')
 
-    # Start function
-    placed_warships = list()  # list of located ships on the board.
-    for ship, amount in ships.items():  # every ship from warships dictionary.
-        for _ in range(amount):  # value = amount of the ships (1, 2, 3, 4).
-            current_coordinates_of_ship = list()  # list of coordinates of the current ship.
-            is_horizontal = True  # Switcher for rotation statement. Horizontal position is by default.
-            for i in range(int(ship)):  # the first location is in the middle of the board, depending on its length.
-                matrix[len(matrix) // 2][len(matrix) // 2 - int(ship) // 2 + i + 1] = SHIP_CELL
-                current_coordinates_of_ship.append([len(matrix) // 2, len(matrix) // 2 - int(ship) // 2 + i + 1])
-                draw_current_ship(placed_warships, current_coordinates_of_ship)
+    def reset(self) -> None:
+        """
+        Clear the list of already placed warships, the list of ship types and their amounts,
+        the list of current coordinates for the current ship, and finally, the player ship matrix.
+        The position variable is switched to horizontal.
+        Then it calls the function to begin generating from start.
 
-            while True:  # Loop with the same ship until it is placed onto the valid cells.
-                display_board(matrix)
-                # update the previous ships on the board that was cleared by current ship.
-                redraw_matrix(placed_warships)
-                # draw current ship above all previously placed ships.
-                draw_current_ship(placed_warships, current_coordinates_of_ship)
-                direction_row, direction_col = 0, 0  # direction variables
+        Returns:
+            None
+        """
+        self.placed_warships.clear()
+        self.set_warships.clear()
+        self.player_board.clear()
+        self.current_coordinates_of_ship.clear()
+        self.is_horizontal = True
+        self.start_player()
 
-                direction = input('Move: W A S D, Rotate: Q or E , Apply: X, Exit: 0 ').upper()  # User's control
-                match direction:
-                    case 'W':  # up
-                        direction_row = -1
-                    case 'S':  # down
-                        direction_row = 1
-                    case 'A':  # left
-                        direction_col = -1
-                    case 'D':  # right
-                        direction_col = 1
-                    case 'Q' | 'E':  # rotation
-                        # check whether the rotation is safe because of the edge of matrix and rotate it.
-                        is_horizontal = rotate_ship(is_horizontal)
-                    case 'X':  # apply
-                        # check whether teh current ship isn't near another one.
-                        for coordinate in current_coordinates_of_ship:
-                            if matrix[coordinate[0]][coordinate[1]] == COLLISION_CELL:
-                                break
-                        else:
-                            empty_cells = set()  # set of unrepeatable cells around the ship.
-                            for c in range(len(current_coordinates_of_ship)):
-                                # make a tuple of coordinates for circling the ship.
-                                for i in AROUND_SHIP_DIRECTIONS:
-                                    row, col = current_coordinates_of_ship[c][0], current_coordinates_of_ship[c][1]
-                                    if 0 < row + i[0] < len(matrix) \
-                                            and 0 < col + i[1] < len(matrix) \
-                                            and matrix[row + i[0]][col + i[1]] != SHIP_CELL:
-                                        empty_cells.add((row + i[0], col + i[1]))
+    def start_player(self) -> None:
+        """
 
-                            # every ship has list of its own coordinates and set of tuples of cells around it.
-                            current_coordinates_of_ship += empty_cells
-                            placed_warships.append(list(current_coordinates_of_ship))
-                            redraw_matrix(placed_warships)
-                            current_coordinates_of_ship.clear()
-                            break
-                    case '0':  # Close program
-                        sys.exit()
-                    case _:  # in case of the invalid input.
-                        pass
-                # Moving the ship depending on the input of user with checking the valid coordinates.
-                for i in range(len(current_coordinates_of_ship)):
-                    if current_coordinates_of_ship[i][0] + direction_row < 1 \
-                            or current_coordinates_of_ship[i][0] + direction_row > len(matrix) - 1 \
-                            or current_coordinates_of_ship[i][1] + direction_col < 1 \
-                            or current_coordinates_of_ship[i][1] + direction_col > len(matrix) - 1:
-                        break
-                else:
-                    clear_previous_step(current_coordinates_of_ship)
-                    for i in range(len(current_coordinates_of_ship)):  # move the ship
-                        matrix[current_coordinates_of_ship[i][0] + direction_row][
-                            current_coordinates_of_ship[i][1] + direction_col] = SHIP_CELL
-                        current_coordinates_of_ship[i][0] = current_coordinates_of_ship[i][0] + direction_row
-                        current_coordinates_of_ship[i][1] = current_coordinates_of_ship[i][1] + direction_col
-                    redraw_matrix(placed_warships)
-                    draw_current_ship(placed_warships, current_coordinates_of_ship)
+        :return:
+        """
+        self.notify('Place your fleet on the board.')
+        self.player_board = sg.create_board()
+        self.set_warships = sg.generate_warships_list(self.set_warships)  # fill the list with warships.
+        self.notify(sg.display_player_ship(self.set_warships, self.player_board, self.current_coordinates_of_ship,
+                                           self.placed_warships))
+        self.update_player_window()
 
-    return matrix
+    def update_player_window(self) -> None:
+        """
+        Updates the matrix, clears a text field in the widget, and appends the updated matrix as a string
+        to the text field.
+
+        Returns:
+            None
+        """
+        sg.display_board(self.player_board)
+        if len(self.set_warships) > 0:
+            self.player_window.clear()
+            self.player_window.append(sg.format_matrix(self.player_board))
+        else:
+            self.player_window.clear()
+            self.player_window.append(sg.format_matrix_without_points(self.player_board))
+            self.notify('There are no more ships to place.')
+
+    def notify(self, text: str) -> None:
+        """
+        Takes a string to place it into the label as notification text.
+
+        Parameters:
+            text (str): The text to display as a notification.
+
+        Returns:
+            None
+        """
+        self.notify_lbl.setText(text)
 
 
-if __name__ == "__main__":
-    start()
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = App()
+    ex.show()
+    sys.exit(app.exec())
