@@ -59,7 +59,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>random.png</normaloff>random.png</iconset>
+     <normaloff>content/icons/random.png</normaloff>content/icons/random.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -85,7 +85,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>up_icon.png</normaloff>up_icon.png</iconset>
+     <normaloff>content/icons/up_icon.png</normaloff>content/icons/up_icon.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -111,7 +111,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>down_icon.png</normaloff>down_icon.png</iconset>
+     <normaloff>content/icons/down_icon.png</normaloff>content/icons/down_icon.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -137,7 +137,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>left_icon.png</normaloff>left_icon.png</iconset>
+     <normaloff>content/icons/left_icon.png</normaloff>content/icons/left_icon.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -163,7 +163,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>right_icon.png</normaloff>right_icon.png</iconset>
+     <normaloff>content/icons/right_icon.png</normaloff>content/icons/right_icon.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -189,7 +189,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>rotation_icon.png</normaloff>rotation_icon.png</iconset>
+     <normaloff>content/icons/rotation_icon.png</normaloff>content/icons/rotation_icon.png</iconset>
    </property>
    <property name="iconSize">
     <size>
@@ -221,7 +221,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>apply_icon.png</normaloff>apply_icon.png</iconset>
+     <normaloff>content/icons/apply_icon.png</normaloff>content/icons/apply_icon.png</iconset>
    </property>
    <property name="checkable">
     <bool>false</bool>
@@ -300,7 +300,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap>logo3.png</pixmap>
+    <pixmap>content/logos/gcore_logo.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
@@ -355,8 +355,6 @@
    </property>
   </widget>
  </widget>
- <resources>
-  <include location="images.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

@@ -1,0 +1,5 @@
+1. Add class for ship that
+	- moves
+	- rotates
+	- applies
+	- checks
