@@ -86,9 +86,15 @@ class ShipGenerationWindow(QMainWindow):
 
     def confirm(self):
         if self.player.confirm():
-            self.battle_window = BattleWindow(self.player.name, self.bot.placed_ships, self.player.placed_ships)
+            self.clear_bot_board_from_points()
+            self.battle_window = BattleWindow(self.bot, self.player)
             self.battle_window.show()
             self.close()
         else:
             print("There are some ships to place.")
 
+    def clear_bot_board_from_points(self):
+        for row in range(len(self.bot.board)):
+            for col in range(len(self.bot.board[row])):
+                if self.bot.board[row][col] == '.':
+                    self.bot.board[row][col] = '   '

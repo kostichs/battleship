@@ -29,7 +29,7 @@ class Gamer:
     Object Gamer can give commands to manipulate its ships on the board, like move, rotate, apply, reset etc.
     This class gives notifications for every action of its object.
     """
-    def __init__(self, name='bot', size=11):
+    def __init__(self, name='Admiral', size=11):
         self.size = size
         self.name = name
         self.scores = 0
@@ -39,6 +39,9 @@ class Gamer:
         self.set_warships = list()
         self.placed_ships = list()
         self.generate_ships()
+
+    def get_ship_cell(self):
+        return SHIP_CELL  # Constant for displaying the ship on the board.
 
     def generate_ships(self) -> None:
         """
