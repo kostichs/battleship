@@ -19,8 +19,13 @@ class ShipGenerationWindow(QMainWindow):
         self.apply_btn.clicked.connect(self.apply)
         self.reset_btn.clicked.connect(self.reset)
         self.random_btn.clicked.connect(self.random)
+
+        self.bot = Gamer()
+        self.bot.set_warships_random(self.bot.board, self.bot.placed_ships)
+
         self.player = Gamer(name)
         self.board_txt.setFont(QFont("Courier New"))
+
         self.player.display_player_ship()
         self.board_txt.setPlainText(self.player.get_board())
 
@@ -75,6 +80,6 @@ class ShipGenerationWindow(QMainWindow):
         self.player.reset()
         self.player.random()
         self.update_window()
-        print(self.player.placed_ships)
+
         pass
 
