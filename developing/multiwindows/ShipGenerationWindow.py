@@ -15,6 +15,7 @@ class ShipGenerationWindow(QMainWindow):
         self.down_btn.clicked.connect(self.down)
         self.left_btn.clicked.connect(self.left)
         self.right_btn.clicked.connect(self.right)
+        self.rotate_btn.clicked.connect(self.rotate)
         self.player = Gamer(name)
         self.board_txt.setFont(QFont("Courier New"))
         self.player.display_player_ship()
@@ -52,3 +53,10 @@ class ShipGenerationWindow(QMainWindow):
     def right(self):
         self.player.motion(0, 1)
         self.update_window()
+
+    def rotate(self):
+        print(self.player.current_coordinates_of_ship)
+        self.player.rotate()
+        print(self.player.current_coordinates_of_ship)
+        self.update_window()
+

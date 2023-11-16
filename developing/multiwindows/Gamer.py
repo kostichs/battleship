@@ -32,6 +32,7 @@ class Gamer:
     def __init__(self, name='bot', size=11):
         self.name = name
         self.scores = 0
+        self.is_horizontal = True
         self.board = [['.' for i in range(size)] for j in range(size)]
         self.current_coordinates_of_ship = list()
         self.set_warships = list()
@@ -71,7 +72,68 @@ class Gamer:
         pass
 
     def rotate(self):
-        pass
+        if len(self.set_warships) > 0:
+            self.is_horizontal = self.rotate_ship()
+            self.motion(0, 0)
+        else:
+            print('There are no more ships.')
+
+    def rotate_ship(self) -> bool:
+        """
+        Rotate the ship from a horizontal to a vertical position or vice versa.
+
+        The function checks the current position of the ship and, based on whether it is in a horizontal or vertical
+        position, calculates new coordinates to rotate the ship. It also checks whether the new position goes beyond the
+        matrix boundaries. If rotation is not possible due to going out of the matrix range, the ship's position remains
+        unchanged, and no modifications occur.
+
+        Parameters:
+            horizontal (bool): The current orientation of the ship. True for horizontal, False for vertical.
+            warships (list): List of ships and their quantities.
+            coordinates (list): List of coordinates of the current ship.
+            board (list[list[str]]): The game board represented as a list of lists.
+            placed_warships (list): List of coordinates of previously placed ships.
+
+        Returns:
+            bool: The new orientation of the ship after attempting to rotate. True for horizontal, False for vertical.
+        """
+        ship_type = int(self.set_warships[0][0])
+        print('j')
+        if self.is_horizontal:  # horizontal position
+            for i in range(len(self.current_coordinates_of_ship)):
+                current_cell = self.current_coordinates_of_ship[i]  # reduce the length of next expressions.
+                if current_cell[0] - ship_type // 2 + i < 1 \
+                        or current_cell[0] - ship_type // 2 + i > len(self.board) - 1 \
+                        or current_cell[1] + ship_type // 2 - i < 1 \
+                        or current_cell[1] + ship_type // 2 - i > len(self.board) - 1:
+                    return self.is_horizontal
+            else:
+                self.is_horizontal = not self.is_horizontal
+                self.clear_previous_step()
+                for i in range(len(self.current_coordinates_of_ship)):
+                    current_cell = self.current_coordinates_of_ship[i]
+                    current_cell[0] = current_cell[0] - ship_type // 2 + i
+                    current_cell[1] = current_cell[1] + ship_type // 2 - i
+                self.redraw_matrix()
+                self.draw_current_ship()
+        else:  # vertical position
+            for i in range(len(self.current_coordinates_of_ship)):
+                current_cell = self.current_coordinates_of_ship[i]
+                if self.current_coordinates_of_ship[i][1] - ship_type // 2 + i < 1 \
+                        or current_cell[1] - ship_type // 2 + i > len(self.board) - 1 \
+                        or current_cell[0] + ship_type // 2 - i < 1 \
+                        or current_cell[0] + ship_type // 2 - i > len(self.board) - 1:
+                    return self.is_horizontal
+            else:
+                self.is_horizontal = True
+                self.clear_previous_step()
+                for i in range(len(self.current_coordinates_of_ship) - 1, -1, -1):
+                    current_cell = self.current_coordinates_of_ship[i]
+                    current_cell[0] = current_cell[0] + ship_type // 2 - i
+                    current_cell[1] = current_cell[1] - ship_type // 2 + i
+                self.redraw_matrix()
+                self.draw_current_ship()
+                return self.is_horizontal
 
     def apply(self):
         pass
@@ -143,7 +205,6 @@ class Gamer:
                 self.board[len(self.board) // 2][len(self.board) // 2 - ship_type // 2 + i + 1] = SHIP_CELL
                 self.current_coordinates_of_ship.append([len(self.board) // 2, len(self.board) // 2 - ship_type // 2 + i + 1])
                 self.draw_current_ship()
-
             # return 'Place the ship on the board.'
             print('Place the ship on the board.')
         else:  # if there are no more ships to place on the board.
@@ -175,7 +236,6 @@ class Gamer:
                 self.board[self.current_coordinates_of_ship[current_coordinate][0]][
                     self.current_coordinates_of_ship[current_coordinate][1]] = SHIP_CELL
 
-
     def motion(self, row, col) -> None:
         """
         Move the ship based on user input for row and column directions.
@@ -200,9 +260,7 @@ class Gamer:
                         or self.current_coordinates_of_ship[i][1] + col > len(self.board) - 1:
                     break
             else:
-                print('hf', self.current_coordinates_of_ship)
                 self.clear_previous_step()
-                print('df', self.current_coordinates_of_ship)
                 for i in range(len(self.current_coordinates_of_ship)):  # move the ship
                     self.board[self.current_coordinates_of_ship[i][0] + row][
                         self.current_coordinates_of_ship[i][1] + col] = SHIP_CELL
