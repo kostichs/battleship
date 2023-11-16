@@ -30,10 +30,11 @@ class Gamer:
     This class gives notifications for every action of its object.
     """
     def __init__(self, name='bot', size=11):
+        self.size = size
         self.name = name
         self.scores = 0
         self.is_horizontal = True
-        self.board = [['.' for i in range(size)] for j in range(size)]
+        self.board = [['.' for i in range(self.size)] for j in range(self.size)]
         self.current_coordinates_of_ship = list()
         self.set_warships = list()
         self.placed_ships = list()
@@ -186,7 +187,22 @@ class Gamer:
             return True
 
     def reset(self):
-        pass
+        """
+                Clear the list of already placed warships, the list of ship types and their amounts,
+                the list of current coordinates for the current ship, and finally, the player ship matrix.
+                The position variable is switched to horizontal.
+                Then it calls the function to begin generating from start.
+
+                Returns:
+                    None
+                """
+        self.placed_ships.clear()
+        self.set_warships.clear()
+        self.board = [['.' for i in range(self.size)] for j in range(self.size)]
+        self.current_coordinates_of_ship.clear()
+        self.is_horizontal = True
+        self.generate_ships()
+        # self.start_player()
 
     def check_board(self):
         pass
@@ -259,6 +275,7 @@ class Gamer:
         and updates the current coordinates of the new ship in the list.
 
         """
+
         if self.set_warships[0][1] <= 0:
             self.set_warships.pop(0)
             # the first location is in the middle of the board, depending on its length.

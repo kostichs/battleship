@@ -17,6 +17,7 @@ class ShipGenerationWindow(QMainWindow):
         self.right_btn.clicked.connect(self.right)
         self.rotate_btn.clicked.connect(self.rotate)
         self.apply_btn.clicked.connect(self.apply)
+        self.reset_btn.clicked.connect(self.reset)
         self.player = Gamer(name)
         self.board_txt.setFont(QFont("Courier New"))
         self.player.display_player_ship()
@@ -63,4 +64,9 @@ class ShipGenerationWindow(QMainWindow):
         if self.player.apply():
             self.player.display_player_ship()
             self.update_window()
+
+    def reset(self):
+        self.player.reset()
+        self.player.display_player_ship()
+        self.board_txt.setPlainText(self.player.get_board())
 

@@ -45,8 +45,8 @@
   <widget class="QPushButton" name="up_btn">
    <property name="geometry">
     <rect>
-     <x>560</x>
-     <y>110</y>
+     <x>580</x>
+     <y>40</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -58,8 +58,8 @@
   <widget class="QPushButton" name="down_btn">
    <property name="geometry">
     <rect>
-     <x>560</x>
-     <y>220</y>
+     <x>580</x>
+     <y>150</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -71,8 +71,8 @@
   <widget class="QPushButton" name="left_btn">
    <property name="geometry">
     <rect>
-     <x>460</x>
-     <y>170</y>
+     <x>480</x>
+     <y>100</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -84,8 +84,8 @@
   <widget class="QPushButton" name="right_btn">
    <property name="geometry">
     <rect>
-     <x>660</x>
-     <y>170</y>
+     <x>680</x>
+     <y>100</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -97,8 +97,8 @@
   <widget class="QPushButton" name="rotate_btn">
    <property name="geometry">
     <rect>
-     <x>560</x>
-     <y>170</y>
+     <x>580</x>
+     <y>100</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -110,14 +110,27 @@
   <widget class="QPushButton" name="apply_btn">
    <property name="geometry">
     <rect>
-     <x>560</x>
-     <y>300</y>
+     <x>580</x>
+     <y>230</y>
      <width>75</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
     <string>Apply</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="reset_btn">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>360</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Reset</string>
    </property>
   </widget>
  </widget>
