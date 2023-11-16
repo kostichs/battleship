@@ -1,4 +1,3 @@
-import sys
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import QSize
@@ -16,8 +15,6 @@ class StartWindow(QMainWindow):
 
     def ship_generation(self):
         name = self.name_line.text()
-        if name == '':
-            name = 'Admiral'
         self.second_window = ShipGenerationWindow(name)
         self.second_window.show()
         self.close()

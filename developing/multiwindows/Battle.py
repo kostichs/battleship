@@ -1,12 +1,13 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtCore import QSize
-from PyQt5.QtGui import QFont, QPixmap
+from PyQt5.QtGui import QFont
 from Gamer import Gamer
-
+import random
 
 HIT_SIGN = 'X'  # sign when ship is damaged
-MISS_SIGN = '@'
+MISS_SIGN = '*'  # sign when player missed
+
 
 class BattleWindow(QMainWindow):
     def __init__(self, bot: Gamer, player: Gamer):
@@ -20,13 +21,15 @@ class BattleWindow(QMainWindow):
 
         self.bot = bot
         self.player = player
-        self.name_txt.setText(f'{self.player.name}')
+        self.name_txt.setText(f'Admiral {self.player.name}')
+        # self.player_shots = list()
+        # self.bot_shots = list()
 
         self.active_player = self.player
 
         self.draw_player_board()
-
-        self.notify(f'{self.active_player.name} is shooting...')
+        self.update_bot_window()
+        self.notify(f'Admiral {self.active_player.name} is shooting...')
 
     def draw_player_board(self):
         formatted_text = ""
@@ -37,15 +40,29 @@ class BattleWindow(QMainWindow):
         self.player_txt.append(formatted_text)
 
     def update_player_window(self):
+        formatted_text = ""
+        for row in self.player.board:
+            formatted_row = [f'{col:^{3}}' for col in row]
+            formatted_text += " ".join(formatted_row) + "\n\n"
+        self.player_txt.clear()
+        self.player_txt.append(formatted_text)
 
-        pass
+    def update_bot_window(self):
+        formatted_text = ""
+        print('bot')
+        print(self.bot.board)
+        for row in self.bot.board:
+            formatted_row = [f'{col:^{3}}' if col != 'o' else '   ' for col in row]
+            formatted_text += " ".join(formatted_row) + "\n\n"
+        self.bot_txt.clear()
+        self.bot_txt.append(formatted_text)
 
     def change_player(self):
         if self.active_player == self.player:
             self.active_player = self.bot
         else:
             self.active_player = self.player
-        self.notify(f'{self.active_player.name} is shooting...')
+        self.notify(f' Admiral {self.active_player.name} is shooting...')
 
     def make_shoot(self):
         if self.active_player == self.player:
@@ -60,21 +77,32 @@ class BattleWindow(QMainWindow):
                     print('MISS')
 
                 self.update_bot_window()
-                pass
+                self.change_player()
+                self.make_shoot()
         else:
-            print('turn of bot')
-            pass
+            self.random_shoot()
+            self.change_player()
 
-        self.change_player()
+    def random_shoot(self):
+        if self.active_player == self.bot:
+            while True:
+                random_row = random.randint(1, len(self.active_player.board) - 1)
+                random_col = random.randint(1, len(self.active_player.board) - 1)
+                if self.player.board[random_row][random_col] == MISS_SIGN \
+                        or self.player.board[random_row][random_col] == HIT_SIGN:
+                    continue
+                else:
+                    row = random_row
+                    col = random_col
 
-    def update_bot_window(self):
-        formatted_text = ""
-        for row in self.bot.board:
-            formatted_row = [f'{col:^{3}}' if col != 'o' else '   ' for col in row]
-            formatted_text += " ".join(formatted_row) + "\n\n"
-        self.bot_txt.clear()
-        self.bot_txt.append(formatted_text)
+                    if self.player.board[row][col] == self.player.get_ship_cell():
+                        self.player.board[row][col] = HIT_SIGN
+                        print('HIT')
+                    else:
+                        self.player.board[row][col] = MISS_SIGN
+                        print('MISS')
+                    break
+            self.update_player_window()
 
     def notify(self, message: str):
         self.message_lbl.setText(message)
-

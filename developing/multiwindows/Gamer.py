@@ -29,7 +29,8 @@ class Gamer:
     Object Gamer can give commands to manipulate its ships on the board, like move, rotate, apply, reset etc.
     This class gives notifications for every action of its object.
     """
-    def __init__(self, name='Admiral', size=11):
+
+    def __init__(self, name='Noname', size=11):
         self.size = size
         self.name = name
         self.scores = 0
@@ -54,27 +55,6 @@ class Gamer:
         self.board = self.display_board()
         return self.format_matrix()
 
-    def command(self, order=''):
-        dir_row, dir_col = 0, 0
-        match order:
-            case 'UP':
-                dir_row = -1
-            case 'DOWN':
-                dir_row = 1
-            case 'LEFT':
-                dir_col = -1
-            case 'RIGHT':
-                dir_col = 1
-            case 'ROTATE':
-                self.rotate()
-            case 'APPLY':
-                self.apply()
-            case 'RESET':
-                self.reset()
-            case _:
-                pass
-        pass
-
     def rotate(self):
         if len(self.set_warships) > 0:
             self.is_horizontal = self.rotate_ship()
@@ -95,7 +75,6 @@ class Gamer:
             bool: The new orientation of the ship after attempting to rotate. True for horizontal, False for vertical.
         """
         ship_type = int(self.set_warships[0][0])
-        print('j')
         if self.is_horizontal:  # horizontal position
             for i in range(len(self.current_coordinates_of_ship)):
                 current_cell = self.current_coordinates_of_ship[i]  # reduce the length of next expressions.
@@ -291,7 +270,8 @@ class Gamer:
             ship_type = int(self.set_warships[0][0])
             for i in range(ship_type):
                 self.board[len(self.board) // 2][len(self.board) // 2 - ship_type // 2 + i + 1] = SHIP_CELL
-                self.current_coordinates_of_ship.append([len(self.board) // 2, len(self.board) // 2 - ship_type // 2 + i + 1])
+                self.current_coordinates_of_ship.append(
+                    [len(self.board) // 2, len(self.board) // 2 - ship_type // 2 + i + 1])
                 self.draw_current_ship()
             # return 'Place the ship on the board.'
             print('Place the ship on the board.')
@@ -301,7 +281,8 @@ class Gamer:
 
     def draw_current_ship(self) -> None:
         """
-        Draws the current ship on the matrix based on its position, considering collisions with other ships or lack thereof.
+        Draws the current ship on the matrix based on its position, considering collisions with other ships or lack
+        thereof.
 
         """
         is_collided = False
@@ -367,7 +348,8 @@ class Gamer:
         :return: None
         """
         for coord in range(len(self.current_coordinates_of_ship)):  # clear the symbols on the previous cell in matrix.
-            self.board[self.current_coordinates_of_ship[coord][0]][self.current_coordinates_of_ship[coord][1]] = EMPTY_CELL
+            self.board[self.current_coordinates_of_ship[coord][0]][
+                self.current_coordinates_of_ship[coord][1]] = EMPTY_CELL
 
     def redraw_matrix(self) -> None:
         """
@@ -386,7 +368,7 @@ class Gamer:
                     self.board[ship[0]][ship[1]] = ''
 
     def random(self):
-         self.board = self.set_warships_random(self.board, self.placed_ships)
+        self.board = self.set_warships_random(self.board, self.placed_ships)
 
     def set_warships_random(self, matrix: list[list[str]], placed_ships: list) -> list[list[str]]:
         """
@@ -403,6 +385,7 @@ class Gamer:
                 list[list[str]]: The updated game board matrix with randomly placed warships.
             """
         ships: dict[str, int] = WARSHIPS
+
         def find_empty_cells(coordinates: ()) -> bool:
             """Check if chosen cells are empty to locate a ship on the board."""
             for coordinate in coordinates:  # check if chosen cells are empty to locate a ship on the board.
@@ -420,11 +403,11 @@ class Gamer:
                     Generate random coordinates for placing a ship on the game board matrix.
 
                     The function selects a random coordinate within the range of the matrix length minus the ship length
-                    to avoid going beyond the matrix boundaries. It also randomly chooses between vertical and horizontal
-                    positions for the ship.
+                    to avoid going beyond the matrix boundaries. It also randomly chooses between vertical and
+                    horizontal positions for the ship.
 
-                    The selected coordinates are checked to ensure they are free and not too close to other ships. If any of
-                    the coordinates does not meet the check conditions, the randomization process restarts.
+                    The selected coordinates are checked to ensure they are free and not too close to other ships.
+                    If any of the coordinates does not meet the check conditions, the randomization process restarts.
                     If the coordinates
                     pass the checks, they are added to the ship's coordinate list.
 
@@ -433,7 +416,8 @@ class Gamer:
                         ship (str): The size of the ship for which random coordinates are generated.
 
                     Returns:
-                        list[tuple]: A list of tuples representing the generated random coordinates for placing the ship.
+                        list[tuple]: A list of tuples representing the generated random coordinates for
+                        placing the ship.
 
                     Raises:
                         ValueError: If the size of the ship is not a positive integer.
@@ -472,7 +456,7 @@ class Gamer:
                                 if 0 < ship_coordinates[c][0] + i[0] < len(matrix) \
                                         and 0 < ship_coordinates[c][1] + i[1] < len(matrix) \
                                         and is_empty(
-                                    matrix[ship_coordinates[c][0] + i[0]][ship_coordinates[c][1] + i[1]]):
+                                        matrix[ship_coordinates[c][0] + i[0]][ship_coordinates[c][1] + i[1]]):
                                     matrix[ship_coordinates[c][0] + i[0]][ship_coordinates[c][1] + i[1]] = ' '
                                 else:
                                     continue

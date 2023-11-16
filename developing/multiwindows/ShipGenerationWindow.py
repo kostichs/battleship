@@ -1,6 +1,6 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtGui import QFont, QPixmap
+from PyQt5.QtGui import QFont
 from Gamer import Gamer
 from Battle import BattleWindow
 from Ship import Ship
@@ -12,7 +12,7 @@ class ShipGenerationWindow(QMainWindow):
         self.battle_window = None
         uic.loadUi('ShipGenerationWindow.ui', self)
         self.setWindowTitle("Ship Generation")
-        self.name_lbl.setText(f'Hello {name}')
+        self.name_lbl.setText(f'Hello Admiral {name}!')
         self.up_btn.clicked.connect(self.up)
         self.down_btn.clicked.connect(self.down)
         self.left_btn.clicked.connect(self.left)
@@ -86,7 +86,12 @@ class ShipGenerationWindow(QMainWindow):
 
     def confirm(self):
         if self.player.confirm():
+            self.bot.display_board()
+            self.bot.format_matrix()
+            print('bot0')
+            print(self.bot.board)
             self.clear_bot_board_from_points()
+
             self.battle_window = BattleWindow(self.bot, self.player)
             self.battle_window.show()
             self.close()
