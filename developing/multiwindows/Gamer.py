@@ -87,13 +87,6 @@ class Gamer:
         matrix boundaries. If rotation is not possible due to going out of the matrix range, the ship's position remains
         unchanged, and no modifications occur.
 
-        Parameters:
-            horizontal (bool): The current orientation of the ship. True for horizontal, False for vertical.
-            warships (list): List of ships and their quantities.
-            coordinates (list): List of coordinates of the current ship.
-            board (list[list[str]]): The game board represented as a list of lists.
-            placed_warships (list): List of coordinates of previously placed ships.
-
         Returns:
             bool: The new orientation of the ship after attempting to rotate. True for horizontal, False for vertical.
         """
@@ -136,7 +129,59 @@ class Gamer:
                 return self.is_horizontal
 
     def apply(self):
-        pass
+        """
+                Confirm the current coordinates of the ship as the final position.
+
+                After confirmation, all lists related to the current ship will be cleared.
+                If all ships are already placed, this function will be ignored.
+
+                :return: None
+                """
+        if len(self.set_warships) > 0:
+            if self.apply_placement():
+                # every ship has list of its own coordinates and set of cells around it.
+                self.placed_ships.append(list(self.current_coordinates_of_ship))
+                print(self.placed_ships)
+                self.redraw_matrix()
+                self.current_coordinates_of_ship.clear()
+                # after this type of ship was placed, its amount is reduced.
+                self.set_warships[0][1] -= 1
+                # self.update_player_window()
+                # self.display_player_ship()
+                # self.notify(sg.display_player_ship(self.set_warships, self.player_board,
+                #                                    self.current_coordinates_of_ship, self.placed_warships))
+                self.is_horizontal = True
+            else:
+                print('Choose another place.')
+                return
+        else:
+            print('There are no more ships.')
+
+    def apply_placement(self) -> bool:
+        """
+        Checks if the current coordinates of the ship don't conflict with coordinates of other ships.
+
+        If these coordinates are suitable, the cells around the new ship will be marked as empty for a safe zone.
+
+        Returns:
+            bool: True if placement is successful, False if there is a conflict with other ships.
+        """
+        # check whether teh current ship isn't near another one.
+        for coordinate in self.current_coordinates_of_ship:
+            if self.board[coordinate[0]][coordinate[1]] == COLLISION_CELL:
+                return False
+        else:
+            empty_cells = set()  # set of unrepeatable cells around the ship.
+            for c in range(len(self.current_coordinates_of_ship)):
+                # make a tuple of coordinates for circling the ship.
+                for i in AROUND_SHIP_DIRECTIONS:
+                    row, col = self.current_coordinates_of_ship[c][0], self.current_coordinates_of_ship[c][1]
+                    if 0 < row + i[0] < len(self.board) \
+                            and 0 < col + i[1] < len(self.board) \
+                            and self.board[row + i[0]][col + i[1]] != SHIP_CELL:
+                        empty_cells.add((row + i[0], col + i[1]))
+            self.current_coordinates_of_ship += empty_cells
+            return True
 
     def reset(self):
         pass
@@ -186,6 +231,23 @@ class Gamer:
             formatted_text += " ".join(formatted_row) + "\n\n"
         return formatted_text
 
+    def format_matrix_without_points(self):
+        """
+        Transform a matrix represented as a list into a formatted string.
+
+        '.' characters in the matrix will be replaced with spaces (' ') to create a clear battlefield.
+        Each cell's state is formatted and aligned in the middle of a cell size.
+        The resulting string includes newlines for better readability.
+
+        :param matrix: The game board represented as a list of lists.
+        :return: A formatted string representation of the matrix.
+        """
+        formatted_text = ""
+        for row in self.board:
+            formatted_row = [f'{col:^{3}}' if col != '.' else '   ' for col in row]
+            formatted_text += " ".join(formatted_row) + "\n\n"
+        return formatted_text
+
     def display_player_ship(self) -> None:
         """
         If the count of the ship type reaches zero, exclude that ship type from the list, and move to the next type.
@@ -218,16 +280,17 @@ class Gamer:
         """
         is_collided = False
         if len(self.placed_ships) > 0:  # The first time the list of placed ships is empty
-
-            for current_coordinate in range(len(self.current_coordinates_of_ship)):  # clear the matrix
-
-                for w in self.placed_ships:
-                    if self.current_coordinates_of_ship[current_coordinate][0] == w[0] \
-                            and self.current_coordinates_of_ship[current_coordinate][1] == w[1]:
-                        self.board[self.current_coordinates_of_ship[current_coordinate][0]][
-                            self.current_coordinates_of_ship[current_coordinate][1]] = COLLISION_CELL
-                        is_collided = True
-                        break
+            for current_coordinate in range(len(self.current_coordinates_of_ship)):
+                for ship in self.placed_ships:
+                    print('C', current_coordinate)
+                    print('S', self.placed_ships)
+                    for w in ship:
+                        if self.current_coordinates_of_ship[current_coordinate][0] == w[0] \
+                                and self.current_coordinates_of_ship[current_coordinate][1] == w[1]:
+                            self.board[self.current_coordinates_of_ship[current_coordinate][0]][
+                                self.current_coordinates_of_ship[current_coordinate][1]] = COLLISION_CELL
+                            is_collided = True
+                            break
                 if not is_collided:
                     self.board[self.current_coordinates_of_ship[current_coordinate][0]][
                         self.current_coordinates_of_ship[current_coordinate][1]] = SHIP_CELL
@@ -246,9 +309,6 @@ class Gamer:
 
         :param row: The row direction for the ship's motion.
         :param col: The column direction for the ship's motion.
-        :param coordinates: The current coordinates of the ship.
-        :param board: The game board represented as a list of lists.
-        :param warships: List of coordinates of previously placed ships.
         :return: None
         """
         if len(self.set_warships) > 0:
@@ -278,8 +338,6 @@ class Gamer:
         This function updates the game board matrix by setting the cells specified by the given coordinates
         to the default empty cell value.
 
-        :param board: The game board represented as a list of lists.
-        :param coordinates: List of coordinates to clear on the game board.
         :return: None
         """
         for coord in range(len(self.current_coordinates_of_ship)):  # clear the symbols on the previous cell in matrix.
@@ -292,12 +350,11 @@ class Gamer:
         This function draws the ship based on its coordinates provided as a list-type,
         along with the safe-zone represented by the neighboring coordinates.
 
-        :param board: The game board represented as a list of lists.
-        :param warships: List of coordinates of previously placed ships.
         :return: None
         """
-        for ship in self.placed_ships:
-            if type(ship) == list:
-                self.board[ship[0]][ship[1]] = SHIP_CELL
-            else:
-                self.board[ship[0]][ship[1]] = ''
+        for p_ship in self.placed_ships:
+            for ship in p_ship:
+                if type(ship) == list:
+                    self.board[ship[0]][ship[1]] = SHIP_CELL
+                else:
+                    self.board[ship[0]][ship[1]] = ''

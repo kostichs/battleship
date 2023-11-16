@@ -16,6 +16,7 @@ class ShipGenerationWindow(QMainWindow):
         self.left_btn.clicked.connect(self.left)
         self.right_btn.clicked.connect(self.right)
         self.rotate_btn.clicked.connect(self.rotate)
+        self.apply_btn.clicked.connect(self.apply)
         self.player = Gamer(name)
         self.board_txt.setFont(QFont("Courier New"))
         self.player.display_player_ship()
@@ -35,8 +36,8 @@ class ShipGenerationWindow(QMainWindow):
             self.board_txt.append(self.player.format_matrix())
         else:
             self.board_txt.clear()
-            # self.board_txt.append(self.player.format_matrix_without_points(self.player_board))
-            # self.notify('There are no more ships to place.')
+            self.board_txt.append(self.player.format_matrix_without_points())
+            print('There are no more ships to place.')
 
     def up(self):
         self.player.motion(-1, 0)
@@ -55,8 +56,11 @@ class ShipGenerationWindow(QMainWindow):
         self.update_window()
 
     def rotate(self):
-        print(self.player.current_coordinates_of_ship)
         self.player.rotate()
-        print(self.player.current_coordinates_of_ship)
+        self.update_window()
+
+    def apply(self):
+        self.player.apply()
+        self.player.display_player_ship()
         self.update_window()
 
