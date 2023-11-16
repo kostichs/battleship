@@ -47,8 +47,8 @@ class Gamer:
         print(self.set_warships)
 
     def get_board(self):
-        self.board = self.display_board(self.board)
-        return self.format_matrix(self.board)
+        self.board = self.display_board()
+        return self.format_matrix()
 
     def command(self, order=''):
         dir_row, dir_col = 0, 0
@@ -86,7 +86,7 @@ class Gamer:
     def check_board(self):
         pass
 
-    def display_board(self, matrix: list[list[str]]) -> list[list[str]]:
+    def display_board(self) -> list[list[str]]:
         """
         Print the game board, represented as a matrix of cell states.
 
@@ -95,39 +95,35 @@ class Gamer:
         Numbers are used to fill the top edge of the board.
         The cell at board[0][0] is intentionally left empty because it doesn't participate in the game.
 
-        :param matrix: A list of lists representing the current state of the game board.
-        :return: None
         """
         letters = 'ABCDEFGHIJ'
-        for row in range(1, len(matrix)):
-            matrix[row][0] = letters[row - 1]
+        for row in range(1, len(self.board)):
+            self.board[row][0] = letters[row - 1]
 
-        for col in range(1, len(matrix)):
-            matrix[0][col] = str(col)
+        for col in range(1, len(self.board)):
+            self.board[0][col] = str(col)
 
         cell_size = 3
         flag = True
-        matrix[0][0] = ' '
-        for row in matrix:
+        self.board[0][0] = ' '
+        for row in self.board:
             for col in row:
                 if flag:
                     flag = False  # avoid changing of the cell 0x0 that has to be empty.
                 print(f'{col:^{cell_size}}', end=" ")
             print()
-        return matrix
+        return self.board
 
-    def format_matrix(self, board) -> str:
+    def format_matrix(self) -> str:
         """
         Transform a matrix represented as a list into a formatted string.
 
         Each cell's state is formatted and aligned in the middle of a cell size.
         The resulting string includes newlines for better readability.
 
-        :param board: A list of lists representing the matrix to be formatted.
-        :return: A formatted string representing the matrix.
         """
         formatted_text = ""
-        for row in board:
+        for row in self.board:
             formatted_row = [f'{col:^{3}}' for col in row]
             formatted_text += " ".join(formatted_row) + "\n\n"
         return formatted_text
@@ -140,14 +136,6 @@ class Gamer:
         of the matrix,
         and updates the current coordinates of the new ship in the list.
 
-        Parameters:
-            warships (list[list[int, int]]): List of ship types with their counts.
-            board (list[list[str]]): The game board matrix.
-            current_coordinates_of_ship (list): List of coordinates for the current ship.
-            placed_warships (list): List of placed ships on the board.
-
-        Returns:
-            string to notify about the current statement of the game.
         """
         if self.set_warships[0][1] <= 0:
             self.set_warships.pop(0)
@@ -170,30 +158,19 @@ class Gamer:
         """
         Draws the current ship on the matrix based on its position, considering collisions with other ships or lack thereof.
 
-        Parameters:
-            warships (list[list[int, int]]): List of ship types with their counts.
-            current_coordinates (list): List of coordinates for the current ship.
-            board (list[list[str]]): The game board matrix.
-
-        Returns:
-            None
         """
         is_collided = False
         if len(self.set_warships) > 0:  # The first time the list of placed ships is empty
 
             for current_coordinate in range(len(self.current_coordinates_of_ship)):  # clear the matrix
 
-                for war in self.set_warships:
-
-                    for w in war:
-
-                        if self.current_coordinates_of_ship[current_coordinate][0] == w[0] \
-                                and self.current_coordinates_of_ship[current_coordinate][1] == w[1]:
-                            self.board[self.current_coordinates_of_ship[current_coordinate][0]][
-                                self.current_coordinates_of_ship[current_coordinate][1]] = COLLISION_CELL
-                            is_collided = True
-                            break
-
+                for w in self.set_warships:
+                    if self.current_coordinates_of_ship[current_coordinate][0] == w[0] \
+                            and self.current_coordinates_of_ship[current_coordinate][1] == w[1]:
+                        self.board[self.current_coordinates_of_ship[current_coordinate][0]][
+                            self.current_coordinates_of_ship[current_coordinate][1]] = COLLISION_CELL
+                        is_collided = True
+                        break
                 if not is_collided:
                     self.board[self.current_coordinates_of_ship[current_coordinate][0]][
                         self.current_coordinates_of_ship[current_coordinate][1]] = SHIP_CELL
