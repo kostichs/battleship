@@ -377,3 +377,99 @@ class Gamer:
                     self.board[ship[0]][ship[1]] = SHIP_CELL
                 else:
                     self.board[ship[0]][ship[1]] = ''
+
+    def random(self):
+         self.board = set_warships_random(self.board, WARSHIPS)
+
+def set_warships_random(matrix: list[list[str]], ships: dict[str, int]) -> list[list[str]]:
+    """
+        Randomly places warships on the game board matrix.
+
+        Each warship is represented by a specific character (SHIP_CELL) in the matrix,
+        and empty cells around the ship are set to ' ' to avoid collision with other ships.
+
+        Parameters:
+            matrix (list[list[str]]): The game board represented as a matrix of cell states.
+            ships (dict[str, int]): Dictionary of n-cell-long warships as keys with their amounts as values.
+
+        Returns:
+            list[list[str]]: The updated game board matrix with randomly placed warships.
+        """
+
+    def find_empty_cells(coordinates: ()) -> bool:
+        """Check if chosen cells are empty to locate a ship on the board."""
+        for coordinate in coordinates:  # check if chosen cells are empty to locate a ship on the board.
+            if matrix[coordinate[0]][coordinate[1]] != EMPTY_CELL:
+                return False
+        else:
+            return True
+
+    def is_empty(cell: str) -> bool:
+        """This function is part of the calculation for neighboring cells to avoid redundant computations."""
+        return cell != SHIP_CELL
+
+    def give_random_coordinates() -> list[tuple]:
+        """
+                Generate random coordinates for placing a ship on the game board matrix.
+
+                The function selects a random coordinate within the range of the matrix length minus the ship length
+                to avoid going beyond the matrix boundaries. It also randomly chooses between vertical and horizontal
+                positions for the ship.
+
+                The selected coordinates are checked to ensure they are free and not too close to other ships. If any of
+                the coordinates does not meet the check conditions, the randomization process restarts.
+                If the coordinates
+                pass the checks, they are added to the ship's coordinate list.
+
+                Parameters:
+                    matrix (list[list[str]]): The game board represented as a matrix of cell states.
+                    ship (str): The size of the ship for which random coordinates are generated.
+
+                Returns:
+                    list[tuple]: A list of tuples representing the generated random coordinates for placing the ship.
+
+                Raises:
+                    ValueError: If the size of the ship is not a positive integer.
+
+                Example:
+                    >>> give_random_coordinates(matrix, "3")
+                    [(2, 3), (3, 3), (4, 3)]
+            """
+        vertical_position, horizontal_position = 0, 1
+        rand_position = random.randint(vertical_position, horizontal_position)
+        rand_row = random.randint(1, len(matrix) - int(ship))
+        if rand_position == vertical_position:
+            rand_row = random.randint(1, len(matrix) - int(ship))
+            coordinates = [(rand_row + i, rand_row) for i in range(int(ship))]
+        else:
+            rand_col = random.randint(1, len(matrix[0]) - int(ship))
+            coordinates = [(rand_row, rand_col + i) for i in range(int(ship))]
+        return coordinates
+
+    for ship, value in ships.items():  # every ship from warships dictionary
+        for _ in range(value):  # value = amount of the ships (1, 2, 3, 4)
+            while True:
+                ship_coordinates = give_random_coordinates()
+                if find_empty_cells(ship_coordinates):
+                    for x in range(len(ship_coordinates)):
+                        matrix[ship_coordinates[x][0]][ship_coordinates[x][1]] = SHIP_CELL
+                    # warship is placed. Now we need to set empty cells around the ship to avoid collision with
+                    # other ships.
+                    for c in range(len(ship_coordinates)):
+                        '''
+                        make a tuple of coordinates for circling the ship.
+                        make a unique condition for every single cell around the ship.
+                        '''
+                        for i in AROUND_SHIP_DIRECTIONS:
+                            if 0 < ship_coordinates[c][0] + i[0] < len(matrix) \
+                                    and 0 < ship_coordinates[c][1] + i[1] < len(matrix) \
+                                    and is_empty(
+                                matrix[ship_coordinates[c][0] + i[0]][ship_coordinates[c][1] + i[1]]):
+                                matrix[ship_coordinates[c][0] + i[0]][ship_coordinates[c][1] + i[1]] = ' '
+                            else:
+                                continue
+                    break
+                else:
+                    continue
+
+    return matrix

@@ -123,7 +123,7 @@
   <widget class="QPushButton" name="reset_btn">
    <property name="geometry">
     <rect>
-     <x>580</x>
+     <x>670</x>
      <y>360</y>
      <width>75</width>
      <height>23</height>
@@ -131,6 +131,19 @@
    </property>
    <property name="text">
     <string>Reset</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="random_btn">
+   <property name="geometry">
+    <rect>
+     <x>480</x>
+     <y>360</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Random</string>
    </property>
   </widget>
  </widget>

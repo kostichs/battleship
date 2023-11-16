@@ -18,6 +18,7 @@ class ShipGenerationWindow(QMainWindow):
         self.rotate_btn.clicked.connect(self.rotate)
         self.apply_btn.clicked.connect(self.apply)
         self.reset_btn.clicked.connect(self.reset)
+        self.random_btn.clicked.connect(self.random)
         self.player = Gamer(name)
         self.board_txt.setFont(QFont("Courier New"))
         self.player.display_player_ship()
@@ -69,4 +70,10 @@ class ShipGenerationWindow(QMainWindow):
         self.player.reset()
         self.player.display_player_ship()
         self.board_txt.setPlainText(self.player.get_board())
+
+    def random(self):
+        self.player.reset()
+        self.player.random()
+        self.update_window()
+        pass
 
