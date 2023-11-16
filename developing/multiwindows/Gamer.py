@@ -473,5 +473,5 @@ class Gamer:
                         break
                     else:
                         continue
-
+        self.set_warships.clear()
         return matrix
