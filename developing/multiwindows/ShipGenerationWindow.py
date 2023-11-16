@@ -11,6 +11,10 @@ class ShipGenerationWindow(QMainWindow):
         uic.loadUi('ShipGenerationWindow.ui', self)
         self.setWindowTitle("Ship Generation")
         self.name_lbl.setText(f'Hello {name}')
+        self.up_btn.clicked.connect(self.up)
+        self.down_btn.clicked.connect(self.down)
+        self.left_btn.clicked.connect(self.left)
+        self.right_btn.clicked.connect(self.right)
         self.player = Gamer(name)
         self.board_txt.setFont(QFont("Courier New"))
         self.player.display_player_ship()
@@ -24,13 +28,27 @@ class ShipGenerationWindow(QMainWindow):
         Returns:
             None
         """
-
-        self.player.display_board(self.player.board)
-        print(self.player.set_warships)
+        self.player.display_board()
         if len(self.player.set_warships) > 0:
             self.board_txt.clear()
-            self.board_txt.append(self.player.format_matrix(self.player.board))
+            self.board_txt.append(self.player.format_matrix())
         else:
             self.board_txt.clear()
             # self.board_txt.append(self.player.format_matrix_without_points(self.player_board))
-            self.notify('There are no more ships to place.')
+            # self.notify('There are no more ships to place.')
+
+    def up(self):
+        self.player.motion(-1, 0)
+        self.update_window()
+
+    def down(self):
+        self.player.motion(1, 0)
+        self.update_window()
+
+    def left(self):
+        self.player.motion(0, -1)
+        self.update_window()
+
+    def right(self):
+        self.player.motion(0, 1)
+        self.update_window()

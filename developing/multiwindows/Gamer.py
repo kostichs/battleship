@@ -44,7 +44,6 @@ class Gamer:
         """
         for warship, value in WARSHIPS.items():
             self.set_warships.append([int(warship), value])
-        print(self.set_warships)
 
     def get_board(self):
         self.board = self.display_board()
@@ -69,9 +68,6 @@ class Gamer:
                 self.reset()
             case _:
                 pass
-        pass
-
-    def move(self):
         pass
 
     def rotate(self):
@@ -160,11 +156,11 @@ class Gamer:
 
         """
         is_collided = False
-        if len(self.set_warships) > 0:  # The first time the list of placed ships is empty
+        if len(self.placed_ships) > 0:  # The first time the list of placed ships is empty
 
             for current_coordinate in range(len(self.current_coordinates_of_ship)):  # clear the matrix
 
-                for w in self.set_warships:
+                for w in self.placed_ships:
                     if self.current_coordinates_of_ship[current_coordinate][0] == w[0] \
                             and self.current_coordinates_of_ship[current_coordinate][1] == w[1]:
                         self.board[self.current_coordinates_of_ship[current_coordinate][0]][
@@ -178,3 +174,72 @@ class Gamer:
             for current_coordinate in range(len(self.current_coordinates_of_ship)):  # place a ship on the matrix.
                 self.board[self.current_coordinates_of_ship[current_coordinate][0]][
                     self.current_coordinates_of_ship[current_coordinate][1]] = SHIP_CELL
+
+
+    def motion(self, row, col) -> None:
+        """
+        Move the ship based on user input for row and column directions.
+
+        Check whether the ship will stay within the boundaries of the matrix after the move.
+        If the ship is beyond the matrix edges, the motion won't be confirmed,
+        and the ship remains in its current position.
+
+        :param row: The row direction for the ship's motion.
+        :param col: The column direction for the ship's motion.
+        :param coordinates: The current coordinates of the ship.
+        :param board: The game board represented as a list of lists.
+        :param warships: List of coordinates of previously placed ships.
+        :return: None
+        """
+        if len(self.set_warships) > 0:
+            # Moving the ship depending on the input of user with checking the valid coordinates.
+            for i in range(len(self.current_coordinates_of_ship)):
+                if self.current_coordinates_of_ship[i][0] + row < 1 \
+                        or self.current_coordinates_of_ship[i][0] + row > len(self.board) - 1 \
+                        or self.current_coordinates_of_ship[i][1] + col < 1 \
+                        or self.current_coordinates_of_ship[i][1] + col > len(self.board) - 1:
+                    break
+            else:
+                print('hf', self.current_coordinates_of_ship)
+                self.clear_previous_step()
+                print('df', self.current_coordinates_of_ship)
+                for i in range(len(self.current_coordinates_of_ship)):  # move the ship
+                    self.board[self.current_coordinates_of_ship[i][0] + row][
+                        self.current_coordinates_of_ship[i][1] + col] = SHIP_CELL
+                    self.current_coordinates_of_ship[i][0] = self.current_coordinates_of_ship[i][0] + row
+                    self.current_coordinates_of_ship[i][1] = self.current_coordinates_of_ship[i][1] + col
+                self.redraw_matrix()
+                self.draw_current_ship()
+        else:
+            print('There are no more ships to place')
+
+    def clear_previous_step(self) -> None:
+        """
+        Clear the symbols on the previous cell in the matrix after changing the position of the ship.
+
+        This function updates the game board matrix by setting the cells specified by the given coordinates
+        to the default empty cell value.
+
+        :param board: The game board represented as a list of lists.
+        :param coordinates: List of coordinates to clear on the game board.
+        :return: None
+        """
+        for coord in range(len(self.current_coordinates_of_ship)):  # clear the symbols on the previous cell in matrix.
+            self.board[self.current_coordinates_of_ship[coord][0]][self.current_coordinates_of_ship[coord][1]] = EMPTY_CELL
+
+    def redraw_matrix(self) -> None:
+        """
+        Redraws the player's game board, updating the positions of previously placed ships.
+
+        This function draws the ship based on its coordinates provided as a list-type,
+        along with the safe-zone represented by the neighboring coordinates.
+
+        :param board: The game board represented as a list of lists.
+        :param warships: List of coordinates of previously placed ships.
+        :return: None
+        """
+        for ship in self.placed_ships:
+            if type(ship) == list:
+                self.board[ship[0]][ship[1]] = SHIP_CELL
+            else:
+                self.board[ship[0]][ship[1]] = ''
