@@ -75,5 +75,6 @@ class ShipGenerationWindow(QMainWindow):
         self.player.reset()
         self.player.random()
         self.update_window()
+        print(self.player.placed_ships)
         pass
 

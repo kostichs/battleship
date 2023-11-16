@@ -379,9 +379,9 @@ class Gamer:
                     self.board[ship[0]][ship[1]] = ''
 
     def random(self):
-         self.board = set_warships_random(self.board, WARSHIPS)
+         self.board = set_warships_random(self.board, self.placed_ships, WARSHIPS)
 
-def set_warships_random(matrix: list[list[str]], ships: dict[str, int]) -> list[list[str]]:
+def set_warships_random(matrix: list[list[str]], placed_ships: list, ships: dict[str, int]) -> list[list[str]]:
     """
         Randomly places warships on the game board matrix.
 
@@ -453,6 +453,7 @@ def set_warships_random(matrix: list[list[str]], ships: dict[str, int]) -> list[
                 if find_empty_cells(ship_coordinates):
                     for x in range(len(ship_coordinates)):
                         matrix[ship_coordinates[x][0]][ship_coordinates[x][1]] = SHIP_CELL
+
                     # warship is placed. Now we need to set empty cells around the ship to avoid collision with
                     # other ships.
                     for c in range(len(ship_coordinates)):
@@ -468,8 +469,10 @@ def set_warships_random(matrix: list[list[str]], ships: dict[str, int]) -> list[
                                 matrix[ship_coordinates[c][0] + i[0]][ship_coordinates[c][1] + i[1]] = ' '
                             else:
                                 continue
+                    # placed_ships.append(ship_coordinates)
                     break
                 else:
+
                     continue
 
     return matrix
