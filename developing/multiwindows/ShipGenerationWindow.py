@@ -2,12 +2,14 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtGui import QFont, QPixmap
 from Gamer import Gamer
+from Battle import BattleWindow
 from Ship import Ship
 
 
 class ShipGenerationWindow(QMainWindow):
     def __init__(self, name):
         super().__init__()
+        self.battle_window = None
         uic.loadUi('ShipGenerationWindow.ui', self)
         self.setWindowTitle("Ship Generation")
         self.name_lbl.setText(f'Hello {name}')
@@ -19,6 +21,7 @@ class ShipGenerationWindow(QMainWindow):
         self.apply_btn.clicked.connect(self.apply)
         self.reset_btn.clicked.connect(self.reset)
         self.random_btn.clicked.connect(self.random)
+        self.confirm_btn.clicked.connect(self.confirm)
 
         self.bot = Gamer()
         self.bot.set_warships_random(self.bot.board, self.bot.placed_ships)
@@ -81,5 +84,11 @@ class ShipGenerationWindow(QMainWindow):
         self.player.random()
         self.update_window()
 
-        pass
+    def confirm(self):
+        if self.player.confirm():
+            self.battle_window = BattleWindow(self.player.name, self.bot.placed_ships, self.player.placed_ships)
+            self.battle_window.show()
+            self.close()
+        else:
+            print("There are some ships to place.")
 

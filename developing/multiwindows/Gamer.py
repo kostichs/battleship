@@ -202,7 +202,11 @@ class Gamer:
         self.current_coordinates_of_ship.clear()
         self.is_horizontal = True
         self.generate_ships()
-        # self.start_player()
+
+    def confirm(self) -> bool:
+        if len(self.set_warships) == 0:
+            return True
+        return False
 
     def check_board(self):
         pass
