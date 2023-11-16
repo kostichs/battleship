@@ -60,7 +60,7 @@ class ShipGenerationWindow(QMainWindow):
         self.update_window()
 
     def apply(self):
-        self.player.apply()
-        self.player.display_player_ship()
-        self.update_window()
+        if self.player.apply():
+            self.player.display_player_ship()
+            self.update_window()
 

@@ -151,11 +151,13 @@ class Gamer:
                 # self.notify(sg.display_player_ship(self.set_warships, self.player_board,
                 #                                    self.current_coordinates_of_ship, self.placed_warships))
                 self.is_horizontal = True
+                return True
             else:
                 print('Choose another place.')
-                return
+                return False
         else:
             print('There are no more ships.')
+            return False
 
     def apply_placement(self) -> bool:
         """
