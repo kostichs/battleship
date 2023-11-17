@@ -1,5 +1,9 @@
 import random
+<<<<<<< HEAD
+from typing import List
+=======
 import string
+>>>>>>> origin/battleship-with-classes
 
 BOARD_SIZE = 11  # 11x11 = 100 cell + 20 cell for coordinates + 1 for empty cell 0x0.
 EMPTY_CELL = '.'  # This constant string is used to fill the inside part of the board for easy navigation.
@@ -53,9 +57,13 @@ class Gamer:
     def rotate(self):
         if len(self.set_warships) > 0:
             self.rotate_ship()
+<<<<<<< HEAD
+            self.motion(0, 0)
+=======
             self.clear_previous_step()
             self.redraw_matrix()
             self.draw_current_ship()
+>>>>>>> origin/battleship-with-classes
         else:
             print('There are no more ships.')
 
@@ -71,16 +79,35 @@ class Gamer:
         Returns:
             bool: The new orientation of the ship after attempting to rotate. True for horizontal, False for vertical.
         """
+<<<<<<< HEAD
+        ship_length = len(self.current_coordinates_of_ship)
+        if self.is_horizontal:  # horizontal position
+            for i in range(ship_length):
+                x, y = self.current_coordinates_of_ship[i]  # reduce the length of next expressions.
+                if x - ship_length // 2 + i < 1 or x - ship_length // 2 + i > len(self.board) - 1 \
+                        or y + ship_length // 2 - i < 1 or y + ship_length // 2 - i > len(self.board) - 1:
+=======
         ship_length = int(self.set_warships[0][0])
         if self.is_horizontal:  # horizontal position
             for i in range(len(self.current_coordinates_of_ship)):
                 if 1 < self.current_coordinates_of_ship[i][0] - ship_length // 2 + i > len(self.board) - 1 \
                         or 1 < self.current_coordinates_of_ship[i][1] + ship_length // 2 - i > len(self.board) - 1:
+>>>>>>> origin/battleship-with-classes
                     return
             else:
                 self.is_horizontal = not self.is_horizontal
                 self.clear_previous_step()
                 for i in range(len(self.current_coordinates_of_ship)):
+<<<<<<< HEAD
+                    cell = self.current_coordinates_of_ship[i]
+                    cell[0] = cell[0] - ship_length // 2 + i
+                    cell[1] = cell[1] + ship_length // 2 - i
+        else:  # vertical position
+            for i in range(ship_length):
+                x, y = self.current_coordinates_of_ship[i]
+                if y - ship_length // 2 + i < 1 or y - ship_length // 2 + i > len(self.board) - 1 \
+                        or x + ship_length // 2 - i < 1 or x + ship_length // 2 - i > len(self.board) - 1:
+=======
                     current_cell = self.current_coordinates_of_ship[i]
                     current_cell[0] = current_cell[0] - ship_length // 2 + i
                     current_cell[1] = current_cell[1] + ship_length // 2 - i
@@ -88,18 +115,28 @@ class Gamer:
             for i in range(len(self.current_coordinates_of_ship)):
                 if 1 < self.current_coordinates_of_ship[i][1] - ship_length // 2 + i > len(self.board) - 1 \
                         or 1 < self.current_coordinates_of_ship[i][0] + ship_length // 2 - i > len(self.board) - 1:
+>>>>>>> origin/battleship-with-classes
                     return
             else:
                 self.is_horizontal = True
                 self.clear_previous_step()
                 for i in range(len(self.current_coordinates_of_ship) - 1, -1, -1):
+<<<<<<< HEAD
+                    cell = self.current_coordinates_of_ship[i]
+                    cell[0] = cell[0] + ship_length // 2 - i
+                    cell[1] = cell[1] - ship_length // 2 + i
+        self.redraw_matrix()
+        self.draw_current_ship()
+        return
+=======
                     current_cell = self.current_coordinates_of_ship[i]
                     current_cell[0] = current_cell[0] + ship_length // 2 - i
                     current_cell[1] = current_cell[1] - ship_length // 2 + i
         self.redraw_matrix()
         self.draw_current_ship()
+>>>>>>> origin/battleship-with-classes
 
-    def apply(self):
+    def apply(self) -> bool:
         """
                 Confirm the current coordinates of the ship as the final position.
 
@@ -112,7 +149,6 @@ class Gamer:
             if self.apply_placement():
                 # every ship has list of its own coordinates and set of cells around it.
                 self.placed_ships.append(list(self.current_coordinates_of_ship))
-                print(self.placed_ships)
                 self.redraw_matrix()
                 self.current_coordinates_of_ship.clear()
                 # after this type of ship was placed, its amount is reduced.
@@ -274,8 +310,6 @@ class Gamer:
         if len(self.placed_ships) > 0:  # The first time the list of placed ships is empty
             for current_coordinate in range(len(self.current_coordinates_of_ship)):
                 for ship in self.placed_ships:
-                    print('C', current_coordinate)
-                    print('S', self.placed_ships)
                     for w in ship:
                         if self.current_coordinates_of_ship[current_coordinate][0] == w[0] \
                                 and self.current_coordinates_of_ship[current_coordinate][1] == w[1]:
@@ -352,10 +386,7 @@ class Gamer:
                 else:
                     self.board[ship[0]][ship[1]] = ''
 
-    def random(self):
-        self.board = self.set_warships_random(self.board, self.placed_ships)
-
-    def set_warships_random(self, matrix: list[list[str]], placed_ships: list) -> list[list[str]]:
+    def set_warships_random(self) -> list[list[str]]:
         """
             Randomly places warships on the game board matrix.
 
@@ -374,7 +405,7 @@ class Gamer:
         def find_empty_cells(coordinates: ()) -> bool:
             """Check if chosen cells are empty to locate a ship on the board."""
             for coordinate in coordinates:  # check if chosen cells are empty to locate a ship on the board.
-                if matrix[coordinate[0]][coordinate[1]] != EMPTY_CELL:
+                if self.board[coordinate[0]][coordinate[1]] != EMPTY_CELL:
                     return False
             else:
                 return True
@@ -383,7 +414,7 @@ class Gamer:
             """This function is part of the calculation for neighboring cells to avoid redundant computations."""
             return cell != SHIP_CELL
 
-        def give_random_coordinates() -> list[tuple]:
+        def give_random_coordinates() -> list[list[int]]:
             """
                     Generate random coordinates for placing a ship on the game board matrix.
 
@@ -408,18 +439,18 @@ class Gamer:
                         ValueError: If the size of the ship is not a positive integer.
 
                     Example:
-                        >>> give_random_coordinates(matrix, "3")
+                        >>> give_random_coordinates(self.board, "3")
                         [(2, 3), (3, 3), (4, 3)]
                 """
             vertical_position, horizontal_position = 0, 1
             rand_position = random.randint(vertical_position, horizontal_position)
-            rand_row = random.randint(1, len(matrix) - int(ship))
+            rand_row = random.randint(1, len(self.board) - int(ship))
             if rand_position == vertical_position:
-                rand_row = random.randint(1, len(matrix) - int(ship))
-                coordinates = [(rand_row + i, rand_row) for i in range(int(ship))]
+                rand_row = random.randint(1, len(self.board) - int(ship))
+                coordinates = [[rand_row + i, rand_row] for i in range(int(ship))]
             else:
-                rand_col = random.randint(1, len(matrix[0]) - int(ship))
-                coordinates = [(rand_row, rand_col + i) for i in range(int(ship))]
+                rand_col = random.randint(1, len(self.board[0]) - int(ship))
+                coordinates = [[rand_row, rand_col + i] for i in range(int(ship))]
             return coordinates
 
         for ship, value in ships.items():  # every ship from warships dictionary
@@ -428,26 +459,33 @@ class Gamer:
                     ship_coordinates = give_random_coordinates()
                     if find_empty_cells(ship_coordinates):
                         for x in range(len(ship_coordinates)):
-                            matrix[ship_coordinates[x][0]][ship_coordinates[x][1]] = SHIP_CELL
+                            self.board[ship_coordinates[x][0]][ship_coordinates[x][1]] = SHIP_CELL
+
 
                         # warship is placed. Now we need to set empty cells around the ship to avoid collision with
                         # other ships.
+                        set_cells = set()
                         for c in range(len(ship_coordinates)):
                             '''
                             make a tuple of coordinates for circling the ship.
                             make a unique condition for every single cell around the ship.
                             '''
+
                             for i in AROUND_SHIP_DIRECTIONS:
-                                if 0 < ship_coordinates[c][0] + i[0] < len(matrix) \
-                                        and 0 < ship_coordinates[c][1] + i[1] < len(matrix) \
+                                if 0 < ship_coordinates[c][0] + i[0] < len(self.board) \
+                                        and 0 < ship_coordinates[c][1] + i[1] < len(self.board) \
                                         and is_empty(
-                                        matrix[ship_coordinates[c][0] + i[0]][ship_coordinates[c][1] + i[1]]):
-                                    matrix[ship_coordinates[c][0] + i[0]][ship_coordinates[c][1] + i[1]] = ' '
+                                        self.board[ship_coordinates[c][0] + i[0]][ship_coordinates[c][1] + i[1]]):
+                                    self.board[ship_coordinates[c][0] + i[0]][ship_coordinates[c][1] + i[1]] = ' '
+                                    #ship_coordinates.append((ship_coordinates[c][0] + i[0], ship_coordinates[c][1] + i[1]))
+                                    set_cells.add((ship_coordinates[c][0] + i[0], ship_coordinates[c][1] + i[1]))
                                 else:
                                     continue
-                        placed_ships.append(ship_coordinates)
+                        print(set_cells)
+                        ship_coordinates += set_cells
+                        self.placed_ships.append(ship_coordinates)
                         break
                     else:
                         continue
         self.set_warships.clear()
-        return matrix
+        return self.board

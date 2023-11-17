@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtGui import QFont
 from Gamer import Gamer
 from Battle import BattleWindow
-from Ship import Ship
 
 
 class ShipGenerationWindow(QMainWindow):
@@ -24,7 +23,7 @@ class ShipGenerationWindow(QMainWindow):
         self.confirm_btn.clicked.connect(self.confirm)
 
         self.bot = Gamer()
-        self.bot.set_warships_random(self.bot.board, self.bot.placed_ships)
+        self.bot.set_warships_random()
 
         self.player = Gamer(name)
         self.board_txt.setFont(QFont("Courier New"))
@@ -81,15 +80,13 @@ class ShipGenerationWindow(QMainWindow):
 
     def random(self):
         self.player.reset()
-        self.player.random()
+        self.player.set_warships_random()
         self.update_window()
 
     def confirm(self):
         if self.player.confirm():
             self.bot.display_board()
             self.bot.format_matrix()
-            print('bot0')
-            print(self.bot.board)
             self.clear_bot_board_from_points()
 
             self.battle_window = BattleWindow(self.bot, self.player)

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>917</width>
-    <height>496</height>
+    <width>1026</width>
+    <height>579</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -121,6 +121,32 @@
    </property>
    <property name="text">
     <string>Shoot!</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="scores_bot_lbl">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>10</y>
+     <width>47</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Scores: 0</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="scores_player_lbl">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>10</y>
+     <width>47</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Scores: 0</string>
    </property>
   </widget>
  </widget>

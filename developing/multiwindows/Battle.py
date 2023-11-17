@@ -24,6 +24,8 @@ class BattleWindow(QMainWindow):
         self.name_txt.setText(f'Admiral {self.player.name}')
         # self.player_shots = list()
         # self.bot_shots = list()
+        # print('Player: ', self.player.placed_ships)
+        # print('Bot: ', self.bot.placed_ships)
 
         self.active_player = self.player
 
@@ -42,15 +44,13 @@ class BattleWindow(QMainWindow):
     def update_player_window(self):
         formatted_text = ""
         for row in self.player.board:
-            formatted_row = [f'{col:^{3}}' for col in row]
+            formatted_row = [f'{col:^{3}}' if col != '.' else '   ' for col in row]
             formatted_text += " ".join(formatted_row) + "\n\n"
         self.player_txt.clear()
         self.player_txt.append(formatted_text)
 
     def update_bot_window(self):
         formatted_text = ""
-        print('bot')
-        print(self.bot.board)
         for row in self.bot.board:
             formatted_row = [f'{col:^{3}}' if col != 'o' else '   ' for col in row]
             formatted_text += " ".join(formatted_row) + "\n\n"
@@ -71,7 +71,33 @@ class BattleWindow(QMainWindow):
                 col = int(self.col_line.text())
                 if self.bot.board[row][col] == self.bot.get_ship_cell():
                     self.bot.board[row][col] = HIT_SIGN
-                    print('HIT')
+                    self.notify('HIT')
+                    self.player.scores += 1
+                    self.scores_player_lbl.setText(f'Scores: {self.player.scores}')
+                    for ship in self.bot.placed_ships:
+                        print(ship)
+                        for coordinate in ship:
+                            if type(coordinate) == list:
+                                if [row, col] in ship:
+                                    print('true')
+                                    flag = True
+                                    for s in ship:
+                                        if type(s) == list:
+                                            print(self.bot.board[s[0]][s[1]])
+                                            if self.bot.board[s[0]][s[1]] != HIT_SIGN:
+                                                flag = False
+                                                break
+                                            else:
+                                                continue
+                                    if flag:
+                                        print("Ship is drown")
+                                        for empty in ship:
+                                            if type(empty) == tuple:
+                                                print(self.player.board)
+                                                self.bot.board[empty[0]][empty[1]] = '.'
+                                                pass
+                                else:
+                                    print('false')
                 else:
                     self.bot.board[row][col] = MISS_SIGN
                     print('MISS')
@@ -97,6 +123,8 @@ class BattleWindow(QMainWindow):
 
                     if self.player.board[row][col] == self.player.get_ship_cell():
                         self.player.board[row][col] = HIT_SIGN
+                        self.bot.scores += 1
+                        self.scores_bot_lbl.setText(f'Scores: {self.bot.scores}')
                         print('HIT')
                     else:
                         self.player.board[row][col] = MISS_SIGN
