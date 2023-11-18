@@ -1,9 +1,6 @@
 import random
-<<<<<<< HEAD
 from typing import List
-=======
 import string
->>>>>>> origin/battleship-with-classes
 
 BOARD_SIZE = 11  # 11x11 = 100 cell + 20 cell for coordinates + 1 for empty cell 0x0.
 EMPTY_CELL = '.'  # This constant string is used to fill the inside part of the board for easy navigation.
@@ -57,13 +54,10 @@ class Gamer:
     def rotate(self):
         if len(self.set_warships) > 0:
             self.rotate_ship()
-<<<<<<< HEAD
             self.motion(0, 0)
-=======
             self.clear_previous_step()
             self.redraw_matrix()
             self.draw_current_ship()
->>>>>>> origin/battleship-with-classes
         else:
             print('There are no more ships.')
 
@@ -79,26 +73,17 @@ class Gamer:
         Returns:
             bool: The new orientation of the ship after attempting to rotate. True for horizontal, False for vertical.
         """
-<<<<<<< HEAD
         ship_length = len(self.current_coordinates_of_ship)
         if self.is_horizontal:  # horizontal position
             for i in range(ship_length):
                 x, y = self.current_coordinates_of_ship[i]  # reduce the length of next expressions.
                 if x - ship_length // 2 + i < 1 or x - ship_length // 2 + i > len(self.board) - 1 \
                         or y + ship_length // 2 - i < 1 or y + ship_length // 2 - i > len(self.board) - 1:
-=======
-        ship_length = int(self.set_warships[0][0])
-        if self.is_horizontal:  # horizontal position
-            for i in range(len(self.current_coordinates_of_ship)):
-                if 1 < self.current_coordinates_of_ship[i][0] - ship_length // 2 + i > len(self.board) - 1 \
-                        or 1 < self.current_coordinates_of_ship[i][1] + ship_length // 2 - i > len(self.board) - 1:
->>>>>>> origin/battleship-with-classes
                     return
             else:
                 self.is_horizontal = not self.is_horizontal
                 self.clear_previous_step()
                 for i in range(len(self.current_coordinates_of_ship)):
-<<<<<<< HEAD
                     cell = self.current_coordinates_of_ship[i]
                     cell[0] = cell[0] - ship_length // 2 + i
                     cell[1] = cell[1] + ship_length // 2 - i
@@ -107,34 +92,25 @@ class Gamer:
                 x, y = self.current_coordinates_of_ship[i]
                 if y - ship_length // 2 + i < 1 or y - ship_length // 2 + i > len(self.board) - 1 \
                         or x + ship_length // 2 - i < 1 or x + ship_length // 2 - i > len(self.board) - 1:
-=======
                     current_cell = self.current_coordinates_of_ship[i]
                     current_cell[0] = current_cell[0] - ship_length // 2 + i
                     current_cell[1] = current_cell[1] + ship_length // 2 - i
-        else:  # vertical position
-            for i in range(len(self.current_coordinates_of_ship)):
-                if 1 < self.current_coordinates_of_ship[i][1] - ship_length // 2 + i > len(self.board) - 1 \
-                        or 1 < self.current_coordinates_of_ship[i][0] + ship_length // 2 - i > len(self.board) - 1:
->>>>>>> origin/battleship-with-classes
                     return
-            else:
-                self.is_horizontal = True
-                self.clear_previous_step()
-                for i in range(len(self.current_coordinates_of_ship) - 1, -1, -1):
-<<<<<<< HEAD
-                    cell = self.current_coordinates_of_ship[i]
-                    cell[0] = cell[0] + ship_length // 2 - i
-                    cell[1] = cell[1] - ship_length // 2 + i
+                else:
+                    self.is_horizontal = True
+                    self.clear_previous_step()
+                    for i in range(len(self.current_coordinates_of_ship) - 1, -1, -1):
+                        cell = self.current_coordinates_of_ship[i]
+                        cell[0] = cell[0] + ship_length // 2 - i
+                        cell[1] = cell[1] - ship_length // 2 + i
+                self.redraw_matrix()
+                self.draw_current_ship()
+                return
+            current_cell = self.current_coordinates_of_ship[i]
+            current_cell[0] = current_cell[0] + ship_length // 2 - i
+            current_cell[1] = current_cell[1] - ship_length // 2 + i
         self.redraw_matrix()
         self.draw_current_ship()
-        return
-=======
-                    current_cell = self.current_coordinates_of_ship[i]
-                    current_cell[0] = current_cell[0] + ship_length // 2 - i
-                    current_cell[1] = current_cell[1] - ship_length // 2 + i
-        self.redraw_matrix()
-        self.draw_current_ship()
->>>>>>> origin/battleship-with-classes
 
     def apply(self) -> bool:
         """

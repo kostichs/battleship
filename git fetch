@@ -1,0 +1,31 @@
+[33med62c79[m[33m ([m[1;36mHEAD -> [m[1;32mbattleship-with-classes[m[33m)[m Remove ignored files
+[33m5b87417[m Remove ignored files
+[33m5206f05[m Modified .gitignore
+[33m919cc0b[m Added .gitignore
+[33m748e374[m Added little optimizations to code
+[33m130631a[m GUI and Shoot function improved
+[33m776e151[m Added shoot function and GUI
+[33m78741a3[m Added third window and moving coordinates
+[33m05658d4[m Fixed disable actions after random
+[33mf53c5f7[m Added bot object with random coordinates
+[33m0d4d3f8[m Fixed coordinates list in random function
+[33m2a4e9f3[m Added random function and button
+[33m9be24f8[m added reset function and button
+[33ma16c11b[m Fixed collision placement
+[33md2b2fea[m apply button and function
+[33m518a721[m Added rotation function and button
+[33m237b29b[m Added motion buttons with functions
+[33m4dd2f1c[m new function for Gamer.py
+[33me501f5f[m Added Windows Start and Generation
+[33m3289e2e[m Added Ship and Gamer classes
+[33m3c68f9f[m Structured environment
+[33m448e911[m[33m ([m[1;31morigin/gui-battleship[m[33m)[m Add Output for Ship Generation
+[33mf2dd2fc[m Ship generation, random and manual
+[33me648bfe[m Empty commit
+[33m140bd3d[m Ship generation. Origin.
+[33maabbece[m Test branch 2
+[33m5cbc904[m Test of branch
+[33m7909edc[m Gui. Ship generation
+[33m45857d3[m test commit
+[33m5e47fa2[m Console Ship generation. Random, manual.
+[33mf3084c1[m Initial commit
